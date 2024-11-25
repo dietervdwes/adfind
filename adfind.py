@@ -79,12 +79,8 @@ for tar in tar_list:
 target = '/'.join(tar_list)
 target = 'http://' + target+'/'
 
-start = time.time()
 dfv = []
-conn = aiohttp.TCPConnector(
-        family=socket.AF_INET,
-    )
-    
+   
 def daf():
     a=time.ctime().split(' ')[4]
     return a
@@ -106,32 +102,42 @@ async def fetch(url, session):
 
 #Mulai wordlist
 async def run():
+    conn = aiohttp.TCPConnector(
+            family=socket.AF_INET,
+        )
     url = target + "{}"
     tasks = []
     admin_list = open('admin.txt', 'r')
     paths = []
     for path in admin_list:
+        path = path.strip()
         path = path.replace('\n','')
         paths.append(path)
     async with ClientSession(connector=conn) as session: #creates the tasks
         for i in paths:
-            task = asyncio.ensure_future(fetch(url.format(i), session))
+            task = fetch(url.format(i), session)
+            # task = asyncio.ensure_future(fetch(url.format(i), session))
             tasks.append(task)
-        responses = asyncio.gather(*tasks)
-        await responses
+        responses = await asyncio.gather(*tasks)
+        return responses
         
-#Mulai Loop        
-loop = asyncio.get_event_loop()
-future = asyncio.ensure_future(run())
-loop.run_until_complete(future)
-
+if __name__ == "__main__":
+   #Mulai Loop        
+    start = time.time()
+    # loop = asyncio.get_event_loop()
+    # future = asyncio.ensure_future(run())
+    # loop.run_until_complete(future)
+    #
+    asyncio.run(run())
 #Hasil
-end = time.time()
-script_time = end - start
-print("\n[*] Scan complete at \033[32;1m{} \033[0;00mseconds to complete @ {} ".format(script_time, localtime))
-print(w+"\n["+c+"*"+w+"] Results :")
-if len(dfv) == 0:
-    print("[!] No result !!!")
-else:
-    for y in dfv:
-        print(c+"\n *"+w+" ",y)
+
+    end = time.time()
+    script_time = end - start
+    print("\n[*] Scan complete at \033[32;1m{} \033[0;00mseconds to complete @ {} ".format(script_time, localtime))
+    print(w+"\n["+c+"*"+w+"] Results :")
+    if len(dfv) == 0:
+        print("[!] No result !!!")
+    else:
+        for y in dfv:
+            print(c+"\n *"+w+" ",y)
+
